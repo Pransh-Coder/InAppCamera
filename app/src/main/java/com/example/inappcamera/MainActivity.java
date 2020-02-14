@@ -105,6 +105,7 @@ public class MainActivity extends Activity {
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
+                Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 fos.close();
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
@@ -143,6 +144,7 @@ public class MainActivity extends Activity {
         if (type == MEDIA_TYPE_IMAGE){
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_"+ timeStamp + ".jpg");
+            Log.e("mainActy",mediaStorageDir.getPath());
         } else if(type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "VID_"+ timeStamp + ".mp4");
