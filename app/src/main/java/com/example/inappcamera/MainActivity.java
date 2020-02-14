@@ -3,7 +3,9 @@ package com.example.inappcamera;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -30,6 +32,7 @@ public class MainActivity extends Activity {
     private Camera mCamera;
     private CameraPreview mPreview;
     public static String TAG = "MainActivity";
+    private boolean safeToTakePicture = false;
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
@@ -53,7 +56,7 @@ public class MainActivity extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // get an image from the camera4
+                        // get an image from the camera
                         if(mCamera == null){
 //                            finish();
                             Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
@@ -79,7 +82,7 @@ public class MainActivity extends Activity {
     /**
      * A safe way to get an instance of the Camera object.
      */
-    public static Camera getCameraInstance() {
+    public static Camera getCameraInstance() {          // return obj of Camera type
         Camera c = null;
         try {
             Log.d("inside try","try");
@@ -107,6 +110,8 @@ public class MainActivity extends Activity {
                 fos.write(data);
                 Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 fos.close();
+
+
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
@@ -116,8 +121,15 @@ public class MainActivity extends Activity {
     };
 
     /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
+    private Uri getOutputMediaFileUri(int type){
+
+        //To show img in gallery
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(getOutputMediaFile(type)));
+        sendBroadcast(intent);      //sending broadcast to gallery
+
         return Uri.fromFile(getOutputMediaFile(type));
+
     }
     /**
      * Create a File for saving an image or video
