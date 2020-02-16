@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
                             }
                         }else{
                              captureButton.setText("capture");
-                            Toast.makeText(MainActivity.this, "Refreshed", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, "Refreshed", Toast.LENGTH_SHORT).show();
 //                            preview.removeAllViews();
                             preview.addView(new CameraPreview(MainActivity.this,mCamera));
                             pictureTaken=false;
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
             return true;
         } else {
             // no camera on this device
-            Toast.makeText(context, "Camera not Present!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Camera not Present!", Toast.LENGTH_SHORT).show();
             return false;
         }
     }
@@ -136,7 +136,7 @@ public class MainActivity extends Activity {
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
-                Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 fos.close();
                 pictureTaken=true;
                /* Intent intent = new Intent(MainActivity.this, MainActivity.class);
@@ -217,7 +217,7 @@ public class MainActivity extends Activity {
             mCamera=getCameraInstance();
         }
         preview.addView(new CameraPreview(MainActivity.this,mCamera));
-        Toast.makeText(this, "onRseumme called ", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRseumme called ", Toast.LENGTH_SHORT).show();
         super.onResume();
     }
 
