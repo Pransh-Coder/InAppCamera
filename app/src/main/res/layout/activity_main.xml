@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     >
+    <!-- FrameLayout element is meant to be the container for the camera preview class. This layout
+    type is used so that additional picture information or controls can be overlaid on the live camera preview images.-->
     <FrameLayout
         android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
@@ -18,4 +21,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         />
+
+    <!--<Button
+        android:id="@+id/retake"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="ReTake"/>-->
 </LinearLayout>

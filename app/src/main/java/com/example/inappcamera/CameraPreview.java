@@ -1,6 +1,7 @@
 package com.example.inappcamera;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -8,7 +9,10 @@ import android.view.SurfaceView;
 
 import java.io.IOException;
 
-public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callback {
+/*  A camera preview class is a SurfaceView that can display the live image data coming from a camera, so users can frame and capture a picture or video.*/
+
+/*preview here means showing images that the camera presently can see on surfaceVew*/
+public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callback {    //classPreview class implements SurfaceHolder.Callback in order to capture the callback events for creating and destroying the view, which are needed for assigning the camera preview input.
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
@@ -56,6 +60,15 @@ public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callbac
 
         // set preview size and make any resize, rotate or
         // reformatting changes here
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mCamera.setDisplayOrientation(0);
+            mCamera.lock();
+        }
+        else {
+            mCamera.setDisplayOrientation(90);
+            mCamera.lock();
+        }
 
         // start preview with new settings
         try {

@@ -50,8 +50,8 @@ public class MainActivity extends Activity {
         mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
-
-        Button captureButton = findViewById(R.id.button_capture);
+        //final Button retake = findViewById(R.id.retake);
+        final Button captureButton = findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -61,12 +61,26 @@ public class MainActivity extends Activity {
 //                            finish();
                             Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
                         }else{
+//                            retake.setVisibility(View.VISIBLE);
+//                            captureButton.setVisibility(View.GONE);
                             mCamera.takePicture(null, null,mPicture);
                         }
                     }
                 }
         );
-
+       /* retake.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // get an image from the camera
+                if(mCamera == null){
+//                            finish();
+                    Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
+                }else{
+//                    mCamera.takePicture(null, null,mPicture); npot needed
+//                    captureButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });*/
     }
     /** Check if this device has a camera */
     private boolean checkCameraHardware(Context context) {
@@ -86,7 +100,7 @@ public class MainActivity extends Activity {
         Camera c = null;
         try {
             Log.d("inside try","try");
-            c = Camera.open(); // attempt to get a Camera instance
+            c = Camera.open(); // attempt to get a Camera instance     for primary camera
         } catch (Exception e) {
             // Camera is not available (in use or does not exist)
             Log.e("getCameraInstance",e.toString());
