@@ -17,6 +17,7 @@ public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callbac
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
+
     //constructor
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -26,11 +27,16 @@ public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callbac
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
+
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+
+
     }
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
             Log.d("CameraPreview","surface created!");
@@ -50,7 +56,6 @@ public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callbac
             // preview surface does not exist
             return;
         }
-
         // stop preview before making changes
         try {
             mCamera.stopPreview();
@@ -71,8 +76,22 @@ public class CameraPreview  extends SurfaceView implements SurfaceHolder.Callbac
         }
 
         // start preview with new settings
-        try {
+        try
+        {
+            /*if(surfaceHolder.getSurface()==null){
+                Log.d("mholder","not null");
+                mCamera.setPreviewDisplay(surfaceHolder);
+                mCamera.stopPreview();
+
+            }
+           *//* mCamera.setPreviewDisplay(mHolder);
+            mCamera.startPreview();*//*
+           else {
+               mCamera.startPreview();
+            }*/
+
             mCamera.setPreviewDisplay(mHolder);
+            MainActivity.safeToTakePicture = true;
             mCamera.startPreview();
 
         } catch (Exception e){

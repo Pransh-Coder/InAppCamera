@@ -1,6 +1,8 @@
 package com.example.inappcamera;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,7 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
@@ -30,61 +35,71 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 public class MainActivity extends Activity {
 
     private Camera mCamera;
-    private CameraPreview mPreview;
+    private CameraPreview mPreview;                 //obj of CameraPreview Class
     public static String TAG = "MainActivity";
-    private boolean safeToTakePicture = false;
+    public  static boolean safeToTakePicture = false;
 
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+
+    //FrameLayout preview;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkAndRequestPermissions();
+
+        /*if (ContextCompat.checkSelfPermission(getBaseContext(), "android.permission.CAMERA") != PackageManager.PERMISSION_GRANTED) {
+            final int REQUEST_CODE_ASK_PERMISSION = 124;
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.CAMERA"}, REQUEST_CODE_ASK_PERMISSION);
+        }
+        *//*if(ContextCompat.checkSelfPermission(getBaseContext(),"android.hardware.camera")!= PackageManager.PERMISSION_GRANTED){
+            final  int REQUEST_CODE_ASK_PERMISSION=122;
+            ActivityCompat.requestPermissions(this,new String[]{"android.hardware.camera"},REQUEST_CODE_ASK_PERMISSION);
+        }*//*
+        if (ContextCompat.checkSelfPermission(getBaseContext(), "android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED) {
+            final int REQUEST_CODE_ASK_PERMISSION = 123;
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, REQUEST_CODE_ASK_PERMISSION);
+        }*/
+
         checkCameraHardware(this);
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
+
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        mPreview = new CameraPreview(this, mCamera);  //calling constructor
+        final FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
-        //final Button retake = findViewById(R.id.retake);
+
         final Button captureButton = findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // get an image from the camera
-                        if(mCamera == null){
+
+                        if (mCamera == null) {
 //                            finish();
                             Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
-                        }else{
-//                            retake.setVisibility(View.VISIBLE);
-//                            captureButton.setVisibility(View.GONE);
-                            mCamera.takePicture(null, null,mPicture);
+                        }
+                        else {
+                            mCamera.takePicture(null, null, mPicture);       //In order to retrieve a picture, use the Camera.takePicture() method. This method takes three parameters which receive data from the camera;
+                            Log.d("log",mPreview.toString());
                         }
                     }
                 }
         );
-       /* retake.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // get an image from the camera
-                if(mCamera == null){
-//                            finish();
-                    Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
-                }else{
-//                    mCamera.takePicture(null, null,mPicture); npot needed
-//                    captureButton.setVisibility(View.INVISIBLE);
-                }
-            }
-        });*/
     }
-    /** Check if this device has a camera */
+
+    /**
+     * Check if this device has a camera
+     */
     private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             // this device has a camera
             return true;
         } else {
@@ -93,17 +108,18 @@ public class MainActivity extends Activity {
             return false;
         }
     }
+
     /**
      * A safe way to get an instance of the Camera object.
      */
     public static Camera getCameraInstance() {          // return obj of Camera type
         Camera c = null;
         try {
-            Log.d("inside try","try");
+            Log.d("inside try", "try");
             c = Camera.open(); // attempt to get a Camera instance     for primary camera
         } catch (Exception e) {
             // Camera is not available (in use or does not exist)
-            Log.e("getCameraInstance",e.toString());
+            Log.e("getCameraInstance", e.toString());
         }
         return c; // returns null if camera is unavailable
     }
@@ -115,6 +131,7 @@ public class MainActivity extends Activity {
 
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null) {
+                //safeToTakePicture = true;
                 Log.d(TAG, "Error creating media file, check storage permissions");
                 return;
             }
@@ -125,17 +142,24 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 fos.close();
 
+               /* Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);*/
+
 
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
                 Log.d(TAG, "Error accessing file: " + e.getMessage());
             }
+            //safeToTakePicture = true;
         }
     };
 
-    /** Create a file Uri for saving an image or video */
-    private Uri getOutputMediaFileUri(int type){
+    /**
+     * Create a file Uri for saving an image or video
+     */
+    private Uri getOutputMediaFileUri(int type) {
 
         //To show img in gallery
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -145,6 +169,7 @@ public class MainActivity extends Activity {
         return Uri.fromFile(getOutputMediaFile(type));
 
     }
+
     /**
      * Create a File for saving an image or video
      */
@@ -167,19 +192,20 @@ public class MainActivity extends Activity {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
+        if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-            Log.e("mainActy",mediaStorageDir.getPath());
-        } else if(type == MEDIA_TYPE_VIDEO) {
+                    "IMG_" + timeStamp + ".jpg");
+            Log.e("mainActy", mediaStorageDir.getPath());
+        } else if (type == MEDIA_TYPE_VIDEO) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
+                    "VID_" + timeStamp + ".mp4");
         } else {
             return null;
         }
 
         return mediaFile;
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -187,10 +213,33 @@ public class MainActivity extends Activity {
         releaseCamera();              // release the camera immediately on pause event
 
     }
-    private void releaseCamera(){
-        if (mCamera != null){
+
+    private void releaseCamera() {
+        if (mCamera != null) {
             mCamera.release();        // release the camera for other applications
             mCamera = null;
         }
+    }
+
+    private void checkAndRequestPermissions() {
+
+        int camera = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA);       // To check if you have permission call ContextCompat.checkSelfPermission
+        int storage = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (camera != PackageManager.PERMISSION_GRANTED) {                  // if camera permission is not granted ask permission and add it to arraylist listPermissionsNeeded using add funct
+            listPermissionsNeeded.add(android.Manifest.permission.CAMERA);
+        }
+        if (storage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (!listPermissionsNeeded.isEmpty())    // if arraylist listPermissionsNeeded is not empty
+        {
+            ActivityCompat.requestPermissions(this,listPermissionsNeeded.toArray                //requestPermissions- used for requesting the permissions
+                    (new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+           // return false;
+        }
+        //return true;
     }
 }
