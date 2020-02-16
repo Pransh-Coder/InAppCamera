@@ -22,15 +22,4 @@
         android:layout_gravity="center"
         />
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@color/colorPrimary"/>
-    <!--<Button
-        android:id="@+id/retake"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="ReTake"/>-->
 </LinearLayout>

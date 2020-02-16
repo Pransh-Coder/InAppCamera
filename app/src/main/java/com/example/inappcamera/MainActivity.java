@@ -1,5 +1,6 @@
 package com.example.inappcamera;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -38,11 +39,11 @@ public class MainActivity extends Activity {
     private CameraPreview mPreview;                 //obj of CameraPreview Class
     public static String TAG = "MainActivity";
     public  static boolean safeToTakePicture = false;
-
+    public boolean pictureTaken=false;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-
+    private FrameLayout preview;
     //FrameLayout preview;
     ImageView imageView;
 
@@ -53,19 +54,6 @@ public class MainActivity extends Activity {
 
         checkAndRequestPermissions();
 
-        /*if (ContextCompat.checkSelfPermission(getBaseContext(), "android.permission.CAMERA") != PackageManager.PERMISSION_GRANTED) {
-            final int REQUEST_CODE_ASK_PERMISSION = 124;
-            ActivityCompat.requestPermissions(this, new String[]{"android.permission.CAMERA"}, REQUEST_CODE_ASK_PERMISSION);
-        }
-        *//*if(ContextCompat.checkSelfPermission(getBaseContext(),"android.hardware.camera")!= PackageManager.PERMISSION_GRANTED){
-            final  int REQUEST_CODE_ASK_PERMISSION=122;
-            ActivityCompat.requestPermissions(this,new String[]{"android.hardware.camera"},REQUEST_CODE_ASK_PERMISSION);
-        }*//*
-        if (ContextCompat.checkSelfPermission(getBaseContext(), "android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED) {
-            final int REQUEST_CODE_ASK_PERMISSION = 123;
-            ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, REQUEST_CODE_ASK_PERMISSION);
-        }*/
-
         checkCameraHardware(this);
         // Create an instance of Camera
         mCamera = getCameraInstance();
@@ -73,7 +61,7 @@ public class MainActivity extends Activity {
 
         // Create our Preview view and set it as the content of our activity.
         mPreview = new CameraPreview(this, mCamera);  //calling constructor
-        final FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview =  findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
         final Button captureButton = findViewById(R.id.button_capture);
@@ -81,14 +69,23 @@ public class MainActivity extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        if (mCamera == null) {
+                        if(!pictureTaken){
+                            if (mCamera == null) {
 //                            finish();
-                            Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            mCamera.takePicture(null, null, mPicture);       //In order to retrieve a picture, use the Camera.takePicture() method. This method takes three parameters which receive data from the camera;
-                            Log.d("log",mPreview.toString());
+                                Toast.makeText(MainActivity.this, "its null", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                mCamera.takePicture(null, null, mPicture);       //In order to retrieve a picture, use the Camera.takePicture() method. This method takes three parameters which receive data from the camera;
+                                captureButton.setText("Retake");
+                                Log.d("log",mPreview.toString());
+                            }
+                        }else{
+                             captureButton.setText("capture");
+                            Toast.makeText(MainActivity.this, "Refreshed", Toast.LENGTH_SHORT).show();
+//                            preview.removeAllViews();
+                            preview.addView(new CameraPreview(MainActivity.this,mCamera));
+                            pictureTaken=false;
+//                            mCamera.takePicture(null,null,mPicture);
                         }
                     }
                 }
@@ -141,7 +138,7 @@ public class MainActivity extends Activity {
                 fos.write(data);
                 Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
                 fos.close();
-
+                pictureTaken=true;
                /* Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(0, 0);*/
@@ -214,6 +211,16 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onResume() {
+        if(mCamera==null){
+            mCamera=getCameraInstance();
+        }
+        preview.addView(new CameraPreview(MainActivity.this,mCamera));
+        Toast.makeText(this, "onRseumme called ", Toast.LENGTH_SHORT).show();
+        super.onResume();
+    }
+
     private void releaseCamera() {
         if (mCamera != null) {
             mCamera.release();        // release the camera for other applications
@@ -238,8 +245,17 @@ public class MainActivity extends Activity {
         {
             ActivityCompat.requestPermissions(this,listPermissionsNeeded.toArray                //requestPermissions- used for requesting the permissions
                     (new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
-           // return false;
         }
-        //return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==REQUEST_ID_MULTIPLE_PERMISSIONS){
+            Intent intent=new Intent(MainActivity.this,MainActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0,0);
+            finish();
+        }
     }
 }
